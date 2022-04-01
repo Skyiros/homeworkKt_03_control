@@ -1,20 +1,78 @@
-fun main() {
-//    val minutesMode = "toMinutes"
-//    val secondsMode = "toSeconds"
-    val user1Time = 5
-    val user2Time = 423
-    val user3Time = 60000
-    val user4Time = 100000
-    val user5Time = 210000
-    val user6Time = 999999
+val totalTransferred: Int = 0
+var lastTransfer: Int = 0
 
-//    println(countTimeDisconnect(user1Time))
-//    println(countTimeDisconnect(user2Time))
-//    println(countTimeDisconnect(user3Time))
-//    println(countTimeDisconnect(user4Time))
-//    println(countTimeDisconnect(user5Time))
-//    println(countTimeDisconnect(user6Time))
+
+fun main() {
+    val typeCardVK = "VKPay"
+    val typeCardMastercard = "Mastercard"
+    val typeCardMaestro = "Maestro"
+    val typeCardMir = "Mir"
+    val typeCardVisa = "Visa"
+
+
+    val transfer1: Int = 10_000
+    val transfer2: Int = 600_000
+    val transfer3: Int = 8_000_000
+
+    println(calculateCommission(amountTransfer = transfer1,lastTransfer = lastTransfer))
+    println(calculateCommission(typeCardMir, transfer2, lastTransfer))
+    println(calculateCommission(typeCardMastercard, transfer3, lastTransfer))
 }
 
-fun countTimeDisconnect(timeCount: Int) = when {
+fun calculateCommission(typeCard: String = "VKPay", amountTransfer: Int, lastTransfer: Int): String {
+    if (checkTheLimit(amountTransfer, typeCard)) return ""
+    val commission = when(typeCard) {
+        "Mastercard","Maestro" -> showKopecksToString(calculateCommissionMastercardMaestro(amountTransfer))
+        "Mir", "Visa" -> showKopecksToString(calculateCommissionVisaMir(amountTransfer))
+        "VKPay" -> showKopecksToString(calculateCommissionVKPay(amountTransfer))
+        else -> "Введенная карта на поддерживается!"
+    }
+    return "Комиссия в копейках составляет: $commission"
+}
+
+fun checkTheLimit(count: Int, typeCard: String): Boolean {
+    if (typeCard == "VKPay" && count > 1_500_000) {
+        println("Превышен максимум единовременного перевода!")
+        return true
+    } else if (count > 15_000_000){
+        println("Превышен максимум единовременного перевода!")
+        return true
+    }
+
+    if (typeCard == "VKPay" && totalTransferred > 4_000_000) {
+        println("Превышен максимум переводов за месяц!")
+        return true
+    } else if (totalTransferred > 60_000_000){
+        println("Превышен максимум переводов за месяц!")
+        return true
+    }
+
+    return false
+}
+
+fun calculateCommissionVisaMir(count: Int): Int {
+    val minimalCommission = 3_500
+    val commission = (count * 75 / 10_000)
+    return if (commission > minimalCommission) commission else minimalCommission
+}
+
+fun calculateCommissionMastercardMaestro(count: Int): Int {
+    return if (count in 30_000..7_500_000) 0 else (count * 6 / 1_000) + 20
+}
+
+fun calculateCommissionVKPay(count: Int): Int {
+    return 0
+}
+
+fun showKopecksToString(kopecks: Int): String {
+    val resultString: String
+
+    if (kopecks == 1 || (kopecks % 10) == 1 && kopecks != 11) {
+        resultString = " $kopecks копейка"
+    } else if (kopecks % 10 in 2..4) {
+        resultString = " $kopecks копейки"
+    } else {
+        resultString = " $kopecks копеек"
+    }
+    return resultString
 }
