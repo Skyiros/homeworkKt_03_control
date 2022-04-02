@@ -76,12 +76,12 @@ fun calculateCommissionVKPay(count: Int): Int {
 fun showKopecksToString(kopecks: Int): String {
     val resultString: String
 
-    if (kopecks == 1 || (kopecks % 10) == 1 && kopecks != 11) {
-        resultString = " $kopecks копейка"
-    } else if (kopecks % 10 in 2..4) {
-        resultString = " $kopecks копейки"
+    if (kopecks % 10 == 1 && kopecks != 11) {
+        resultString = "$kopecks копейка"
+    } else if (kopecks % 10 in 2..4 && kopecks > 20 || kopecks in 2..4) {
+        resultString = "$kopecks копейки"
     } else {
-        resultString = " $kopecks копеек"
+        resultString = "$kopecks копеек"
     }
     return resultString
 }
